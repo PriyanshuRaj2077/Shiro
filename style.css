@@ -1,0 +1,347 @@
+/* Shiro (白) - CSS Stylesheet */
+
+/* Custom Palette Variables */
+:root {
+  --zinc-900: #18181b;
+  --zinc-500: #71717a;
+  --zinc-400: #a1a1aa;
+  --zinc-300: #d4d4d8;
+  --zinc-200: #e4e4e7;
+  --accent-red: #BC002D;
+  --bg-color: #ffffff;
+}
+
+/* Global Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  background-color: var(--bg-color);
+  color: var(--zinc-900);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Layout: Center everything on screen */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Main Container */
+.app-container {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Prevent layout shift/jumping when search is centered */
+  transition: all 0.3s ease;
+}
+
+/* Logo and Wordmark Unit */
+.logo-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  width: fit-content;
+  align-self: flex-start;
+  position: relative;
+  left: 25%;
+  transform: translateX(-50%);
+}
+
+.emblem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 54px;
+  height: 54px;
+  background-color: var(--accent-red);
+  color: #ffffff;
+  border-radius: 50%;
+  font-family: 'Noto Sans JP', 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+  flex-shrink: 0;
+  /* Subtle CJK vertical alignment adjustment */
+  padding-bottom: 2px; 
+}
+
+.wordmark {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--zinc-900);
+  margin: 0;
+  line-height: 1;
+}
+
+/* Search Form styling */
+#search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 40px;
+}
+
+/* Wrapper for input and internal icon */
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 18px;
+  width: 16px;
+  height: 16px;
+  color: var(--zinc-400);
+  pointer-events: none;
+}
+
+#search-input {
+  width: 100%;
+  height: 44px;
+  padding: 10px 18px 10px 44px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--zinc-900);
+  background-color: transparent;
+  border: 1px solid var(--zinc-300);
+  border-radius: 9999px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+#search-input::placeholder {
+  color: var(--zinc-400);
+}
+
+#search-input:focus {
+  border-color: var(--zinc-900);
+}
+
+/* Search Button */
+#search-button {
+  height: 44px;
+  padding: 0 28px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #ffffff;
+  background-color: var(--zinc-900);
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+#search-button:hover {
+  background-color: #27272a; /* Slightly lighter zinc for feedback */
+}
+
+#search-button:active {
+  opacity: 0.9;
+}
+
+/* Results Display Container */
+#result-container {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Utility to hide elements */
+.hidden {
+  display: none !important;
+}
+
+/* Result Typographic Layout */
+.medicine-title {
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--zinc-900);
+  margin: 0 0 32px 0;
+  text-align: center;
+  width: 100%;
+}
+
+/* Plain rectangular boxes with borders and text */
+.result-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 20px 24px;
+  background-color: transparent;
+  border: 1px solid var(--zinc-200);
+  border-radius: 6px;
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.result-section:last-child {
+  margin-bottom: 0;
+}
+
+.result-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--zinc-500);
+  font-weight: 500;
+}
+
+.result-content {
+  font-size: 14px;
+  color: var(--zinc-900);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Error or Muted Status Text styling */
+.status-text {
+  font-size: 14px;
+  color: var(--zinc-500);
+  margin: 0;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Top Navigation styling */
+.top-nav {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  gap: 24px;
+}
+
+.nav-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--zinc-500);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--zinc-900);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Modal Overlay styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-box {
+  background-color: var(--bg-color);
+  color: var(--zinc-900);
+  border-radius: 8px;
+  padding: 32px;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  animation: modalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-size: 22px;
+  line-height: 1;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--zinc-500);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: var(--zinc-900);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+}
+
+.modal-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--zinc-900);
+  margin: 0;
+}
+
+@keyframes modalSlide {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Responsiveness: Tablet/Desktop screen sizing (> 480px width) */
+@media (min-width: 480px) {
+  #search-form {
+    flex-direction: row;
+    gap: 8px;
+  }
+  
+  #search-button {
+    height: 44px;
+  }
+}

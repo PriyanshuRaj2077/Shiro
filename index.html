@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Shiro (白) — A minimalist medicine information lookup tool.">
+  <title>Shiro (白) — Medicine Information Lookup</title>
+  
+  <!-- Fonts from Google Fonts (Inter & Noto Sans JP) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- JavaScript (deferred execution) -->
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <button type="button" class="nav-link" id="nav-about">About</button>
+    <button type="button" class="nav-link" id="nav-credits">Credits</button>
+  </nav>
+
+  <main class="app-container">
+    <!-- Logo wordmark unit -->
+    <div class="logo-lockup">
+      <span class="emblem" id="logo-emblem">白</span>
+      <h1 class="wordmark" id="app-title">Shiro</h1>
+    </div>
+
+    <!-- Search Form -->
+    <form id="search-form">
+      <div class="search-input-wrapper">
+        <!-- SVG Search Icon -->
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <input type="text" id="search-input" placeholder="Search a medicine..." autocomplete="off" aria-label="Search a medicine">
+      </div>
+      <button type="submit" id="search-button">Search</button>
+    </form>
+
+    <!-- Results Display -->
+    <div id="result-container" class="hidden"></div>
+  </main>
+
+  <!-- Modal Overlay -->
+  <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Close modal">&times;</button>
+      <h3 class="modal-title" id="modal-title">Title</h3>
+      <p class="modal-text" id="modal-text">Content</p>
+    </div>
+  </div>
+</body>
+</html>
