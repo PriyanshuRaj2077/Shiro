@@ -77,8 +77,9 @@ body {
 }
 
 .wordmark {
+  font-family: 'Manrope', sans-serif;
   font-size: 24px;
-  font-weight: 500;
+  font-weight: 800;
   color: var(--zinc-900);
   margin: 0;
   line-height: 1;
