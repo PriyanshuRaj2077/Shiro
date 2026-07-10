@@ -1,4 +1,4 @@
-# Shiro (白)
+# 🔴Shiro (白)
 
 A minimalist medicine information lookup tool. Search a medicine, understand what it is, what it's for, and how it works in your body — in plain language, with no clutter.
 
