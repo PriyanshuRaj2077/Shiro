@@ -13,13 +13,6 @@ Shiro is built on one idea: **radical simplicity**. No dashboards, no ads, no un
 
 ---
 
-## Features
-
-### Current (Frontend)
-- Minimalist single-page interface — logo, search box, nothing else
-- Clean, distraction-free result display (medicine name, purpose, mechanism, side effects)
-- Responsive design — works on mobile, tablet, and desktop
-- About and Credits sections via lightweight modals
 
 ### Planned (Backend)
 - Real-time medicine data lookup via the [openFDA API](https://open.fda.gov/apis/)
