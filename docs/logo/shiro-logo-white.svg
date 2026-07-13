@@ -1,0 +1,8 @@
+<svg width="220" height="70" viewBox="0 0 220 70" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="35" cy="35" r="32" fill="#B01030"/>
+  <text x="35" y="47" font-family="'Hiragino Sans', 'Yu Gothic', 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="500"
+        fill="#FFFFFF" text-anchor="middle">白</text>
+
+  <text x="82" y="45" font-family="'Helvetica Neue', Arial, sans-serif" font-size="30" font-weight="700"
+        fill="#FFFFFF">Shiro</text>
+</svg>
