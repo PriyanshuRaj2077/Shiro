@@ -2,19 +2,16 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/logo/shiro-logo-white.svg">
     <source media="(prefers-color-scheme: light)" srcset="docs/logo/shiro-logo-black.svg">
-    <img src="docs/logo/shiro-logo-white.svg" width="220" alt="Shiro Logo">
+    <img src="docs/logo/shiro-logo-white.svg" width="230" alt="Shiro Logo">
   </picture>
 </p>
 
-<h1 align="center">Shiro (白)</h1>
-<p align="center">Minimalist medicine information lookup</p>
+<p align="center">Look up any medicine — what it does, interactions, and side effects, in plain language.</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-in%20development-yellow" alt="Status">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
 </p>
-
-A minimalist medicine information lookup tool. Search a medicine, understand what it is, what it's for, and how it works in your body — in plain language, with no clutter.
 
 ---
 
