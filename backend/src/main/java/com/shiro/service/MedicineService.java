@@ -1,13 +1,17 @@
 package com.shiro.service;
 
+import com.shiro.client.OpenFdaClient;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MedicineService {
-    public String searchMedicine(String name){
-        if(name.equals("paracetamol")){
-            return "details of paracetamol";
+
+        private final OpenFdaClient openFdaClient;
+
+        public MedicineService(OpenFdaClient openFdaClient){
+            this.openFdaClient = openFdaClient;
         }
-        return "Medicine not found";
-    }
+        public String searchMedicine(String name) {
+            return openFdaClient.fetchMedicine(name);
+        }
 }
