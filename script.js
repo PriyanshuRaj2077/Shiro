@@ -1,6 +1,5 @@
 // Shiro (白) - Application Logic
 
-// API Configuration
 const API_BASE_URL = "http://localhost:8080";
 
 // DOM Elements
@@ -15,7 +14,7 @@ const modalClose = document.getElementById("modal-close");
 const modalTitle = document.getElementById("modal-title");
 const modalText = document.getElementById("modal-text");
 
-// Form Event Listener
+// Handle form submit when user searches
 searchForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const query = searchInput.value.trim();
@@ -24,72 +23,148 @@ searchForm.addEventListener("submit", (event) => {
   }
 });
 
-/**
- * Searches medicine information via the backend API.
- * @param {string} query - The name of the medicine to search for.
- */
+// Search for medicine from backend or direct openFDA
 async function searchMedicine(query) {
-  // Set subtle loading state
+  // Show searching text on button
   const originalButtonText = searchButton.textContent;
   searchButton.textContent = "Searching...";
   searchButton.disabled = true;
   searchInput.disabled = true;
 
-  // Clear previous results and keep hidden
+  // Clear last search
   resultContainer.innerHTML = "";
   resultContainer.classList.add("hidden");
 
+  let medicines = [];
+
+  // Try to search using our local backend first
   try {
     const response = await fetch(`${API_BASE_URL}/api/medicine/search?name=${encodeURIComponent(query)}`);
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    // Validate the response shape
-    if (isValidMedicineData(data)) {
-      renderResult(data);
-    } else {
-      renderError("No results found.");
+    if (response.ok) {
+      const data = await response.json();
+      if (data) {
+        const list = Array.isArray(data) ? data : [data];
+        list.forEach(m => {
+          if (isValidMedicineData(m)) {
+            medicines.push(m);
+          }
+        });
+      }
     }
   } catch (error) {
-    console.error("Fetch failed:", error);
+    // If backend is down, we will fetch directly from openFDA in frontend
+  }
+
+  // Also query openFDA directly to get other similar results
+  try {
+    const fdaUrl = `https://api.fda.gov/drug/label.json?search=openfda.brand_name:${encodeURIComponent(query)}*&limit=15`;
+    const fdaResponse = await fetch(fdaUrl);
+    if (fdaResponse.ok) {
+      const fdaData = await fdaResponse.json();
+      if (fdaData.results && fdaData.results.length > 0) {
+        const mapped = fdaData.results.map(r => {
+          const brandNames = r.openfda?.brand_name || [];
+          const genericNames = r.openfda?.generic_name || [];
+          
+          // OTC Fallbacks
+          const purpose = r.purpose?.[0] || r.indications_and_usage?.[0] || null;
+          const mechanism = r.mechanism_of_action?.[0] || r.active_ingredient?.[0] || null;
+          const sideEffects = r.adverse_reactions || r.warnings || null;
+
+          return {
+            brandName: brandNames[0] || null,
+            genericName: genericNames[0] || null,
+            purpose: purpose,
+            mechanism: mechanism,
+            sideEffects: sideEffects
+          };
+        }).filter(item => item.brandName !== null);
+
+        // Add to our list, skip duplicates
+        for (const item of mapped) {
+          if (!medicines.some(m => (m.brandName || "").toLowerCase() === item.brandName.toLowerCase())) {
+            medicines.push(item);
+          }
+        }
+      }
+    }
+  } catch (fdaError) {
+    // openFDA request failed
+  }
+
+  // Restore button status
+  searchButton.textContent = originalButtonText;
+  searchButton.disabled = false;
+  searchInput.disabled = false;
+
+  // Render results if found
+  if (medicines.length > 0) {
+    const sortedMedicines = sortMedicinesBySimilarity(medicines, query);
+    renderMedicines(sortedMedicines, query, 0);
+  } else {
     renderError("No results found.");
-  } finally {
-    // Reset loading state
-    searchButton.textContent = originalButtonText;
-    searchButton.disabled = false;
-    searchInput.disabled = false;
   }
 }
 
-/**
- * Validates if the response matches the expected medicine contract.
- * @param {any} data - The response data to validate.
- * @returns {boolean} True if data matches the contract, false otherwise.
- */
+// Sort results so the closest match stays on top
+function sortMedicinesBySimilarity(list, query) {
+  const q = query.toLowerCase();
+  return list.sort((a, b) => {
+    const aBrand = (a.brandName || "").toLowerCase();
+    const bBrand = (b.brandName || "").toLowerCase();
+    
+    const aExact = aBrand === q;
+    const bExact = bBrand === q;
+    if (aExact && !bExact) return -1;
+    if (!aExact && bExact) return 1;
+    
+    const aStarts = aBrand.startsWith(q);
+    const bStarts = bBrand.startsWith(q);
+    if (aStarts && !bStarts) return -1;
+    if (!aStarts && bStarts) return 1;
+    
+    const aContains = aBrand.includes(q);
+    const bContains = bBrand.includes(q);
+    if (aContains && !bContains) return -1;
+    if (!aContains && bContains) return 1;
+    
+    return aBrand.length - bBrand.length || aBrand.localeCompare(bBrand);
+  });
+}
+
+// Make sure the medicine data is valid
 function isValidMedicineData(data) {
   if (!data || typeof data !== "object") {
     return false;
   }
-  
-  // Must have at least a name (generic or brand) and purpose
-  const hasName = typeof data.genericName === "string" || typeof data.brandName === "string";
-  const hasPurpose = typeof data.purpose === "string";
-  const hasMechanism = typeof data.mechanism === "string";
-  const hasSideEffects = Array.isArray(data.sideEffects);
-  
-  return hasName && hasPurpose && hasMechanism && hasSideEffects;
+  // Must have generic or brand name
+  return (typeof data.genericName === "string" && data.genericName.trim() !== "") || 
+         (typeof data.brandName === "string" && data.brandName.trim() !== "");
 }
 
-/**
- * Renders the medicine information in the result container.
- * @param {object} medicine - Valid medicine data object.
- */
-function renderResult(medicine) {
-  // Format the heading. If both brand and generic names exist and differ, show both.
+// Clean brand name to remove mg, tablets, and marketing texts
+function cleanBrandName(name) {
+  if (!name) return "";
+  
+  return name
+    .replace(/\b\d+(\.\d+)?\s*(mg|g|mcg|%|ml|capsules|tablets|tabs|caplets)\b/gi, "")
+    .replace(/\b(maximum strength|extra strength|regular strength|strength|for adults|adults|cough & cold|pain relief)\b/gi, "")
+    .replace(/\s+-\s+/g, " ")
+    .replace(/[^a-zA-Z0-9\s()]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Render pills list and selected card
+function renderMedicines(medicines, query, activeIndex) {
+  if (!medicines || medicines.length === 0) {
+    renderError("No results found.");
+    return;
+  }
+
+  const medicine = medicines[activeIndex];
+
+  // Set card title heading
   let headingText = "";
   if (medicine.brandName && medicine.genericName && medicine.brandName.toLowerCase() !== medicine.genericName.toLowerCase()) {
     headingText = `${medicine.brandName} (${medicine.genericName})`;
@@ -97,51 +172,90 @@ function renderResult(medicine) {
     headingText = medicine.brandName || medicine.genericName || "Medicine Information";
   }
 
-  // Format side effects
-  const sideEffectsText = medicine.sideEffects.length > 0 
-    ? medicine.sideEffects.join(", ") 
-    : "None reported.";
+  // Check and format details
+  const purposeText = (medicine.purpose && medicine.purpose.trim()) ? medicine.purpose.trim() : "null";
+  const mechanismText = (medicine.mechanism && medicine.mechanism.trim()) ? medicine.mechanism.trim() : "null";
+  
+  let sideEffectsText = "null";
+  if (medicine.sideEffects && medicine.sideEffects.length > 0) {
+    const filtered = medicine.sideEffects.filter(s => s && s.trim());
+    if (filtered.length > 0) {
+      sideEffectsText = filtered.join(", ");
+    }
+  }
 
-  // Create HTML content matching design requirements
-  const htmlContent = `
-    <h2 class="medicine-title">${escapeHTML(headingText)}</h2>
-    
-    <div class="result-section">
-      <span class="result-label">What it's for</span>
-      <p class="result-content">${escapeHTML(medicine.purpose)}</p>
-    </div>
-    
-    <div class="result-section">
-      <span class="result-label">How it works</span>
-      <p class="result-content">${escapeHTML(medicine.mechanism)}</p>
-    </div>
-    
-    <div class="result-section">
-      <span class="result-label">Common side effects</span>
-      <p class="result-content">${escapeHTML(sideEffectsText)}</p>
+  // Create similar pills HTML
+  let pillsHtml = "";
+  if (medicines.length > 1) {
+    pillsHtml = `
+      <div class="similar-results-container">
+        <span class="similar-title">Similar Results</span>
+        <div class="similar-pills">
+          ${medicines.map((m, idx) => `
+            <button type="button" class="similar-pill ${idx === activeIndex ? "active" : ""}" data-index="${idx}">
+              ${escapeHTML(cleanBrandName(m.brandName || m.genericName))}
+            </button>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  // Create details card HTML
+  const cardHtml = `
+    <div class="medicine-card">
+      <div class="medicine-card-header">
+        <h2 class="medicine-card-title">${escapeHTML(headingText)}</h2>
+      </div>
+      
+      <div class="card-detail">
+        <span class="result-label">What it's for</span>
+        <p class="result-content">${escapeHTML(purposeText)}</p>
+      </div>
+      
+      <div class="card-detail">
+        <span class="result-label">How it works</span>
+        <p class="result-content">${escapeHTML(mechanismText)}</p>
+      </div>
+      
+      <div class="card-detail">
+        <span class="result-label">Common side effects</span>
+        <p class="result-content">${escapeHTML(sideEffectsText)}</p>
+      </div>
     </div>
   `;
 
-  resultContainer.innerHTML = htmlContent;
+  resultContainer.innerHTML = pillsHtml + cardHtml;
   resultContainer.classList.remove("hidden");
+
+  // Add click listener to select other pills
+  const pills = resultContainer.querySelectorAll(".similar-pill");
+  pills.forEach(pill => {
+    pill.addEventListener("click", () => {
+      const idx = parseInt(pill.getAttribute("data-index"), 10);
+      renderMedicines(medicines, query, idx);
+    });
+  });
 }
 
-/**
- * Renders a plain muted error or no-results message.
- * @param {string} message - The message to display.
- */
+// Fallback method to render a single result
+function renderResult(medicine) {
+  renderMedicines([medicine], medicine.brandName || medicine.genericName || "", 0);
+}
+
+// Show error messages in result box
 function renderError(message) {
   resultContainer.innerHTML = `<p class="status-text">${escapeHTML(message)}</p>`;
   resultContainer.classList.remove("hidden");
 }
 
-/**
- * Simple HTML escaping helper to prevent XSS.
- * @param {string} unsafe - Unsafe string to escape.
- * @returns {string} Safe escaped string.
- */
+// Escape HTML tags to prevent XSS
 function escapeHTML(unsafe) {
-  return unsafe
+  if (unsafe == null) {
+    return "";
+  }
+
+  return String(unsafe)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -149,7 +263,7 @@ function escapeHTML(unsafe) {
     .replace(/'/g, "&#039;");
 }
 
-// Modal Data and Navigation Handlers
+// Modal popup content definitions
 const modalData = {
   about: {
     title: "About",
@@ -161,41 +275,35 @@ const modalData = {
   }
 };
 
-/**
- * Opens the modal overlay with specific content.
- * @param {string} type - The content type ('about' or 'credits').
- */
+// Open the about or credits modal
 function openModal(type) {
   const content = modalData[type];
   if (content) {
     modalTitle.textContent = content.title;
     modalText.textContent = content.text;
     modalOverlay.classList.remove("hidden");
-    // Focus the close button when opened
     modalClose.focus();
   }
 }
 
-/**
- * Closes the modal overlay.
- */
+// Close the modal
 function closeModal() {
   modalOverlay.classList.add("hidden");
 }
 
-// Modal Event Listeners
+// Setup click listeners for about, credits, and close buttons
 navAbout.addEventListener("click", () => openModal("about"));
 navCredits.addEventListener("click", () => openModal("credits"));
 modalClose.addEventListener("click", closeModal);
 
-// Close on clicking backdrop
+// Close modal if user clicks on backdrop
 modalOverlay.addEventListener("click", (event) => {
   if (event.target === modalOverlay) {
     closeModal();
   }
 });
 
-// Close on pressing Escape key
+// Close modal if user presses Escape key
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !modalOverlay.classList.contains("hidden")) {
     closeModal();

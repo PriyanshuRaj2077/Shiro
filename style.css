@@ -184,32 +184,107 @@ body {
   display: none !important;
 }
 
-/* Result Typographic Layout */
-.medicine-title {
-  font-size: 24px;
-  font-weight: 400;
-  color: var(--zinc-900);
-  margin: 0 0 32px 0;
-  text-align: center;
+/* Similar Results Pills Selector */
+.similar-results-container {
   width: 100%;
-}
-
-/* Plain rectangular boxes with borders and text */
-.result-section {
+  margin-bottom: 24px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
-  width: 100%;
-  padding: 20px 24px;
-  background-color: transparent;
-  border: 1px solid var(--zinc-200);
-  border-radius: 6px;
-  text-align: left;
-  margin-bottom: 16px;
+  animation: fadeIn 0.3s ease;
 }
 
-.result-section:last-child {
-  margin-bottom: 0;
+.similar-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--zinc-500);
+  font-weight: 500;
+}
+
+.similar-pills {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 8px;
+  width: 100%;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.similar-pills::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari and Opera */
+}
+
+.similar-pill {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 6px 14px;
+  background-color: transparent;
+  color: var(--zinc-500);
+  border: 1px solid var(--zinc-200);
+  border-radius: 9999px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.similar-pill:hover {
+  border-color: var(--zinc-900);
+  color: var(--zinc-900);
+}
+
+.similar-pill.active {
+  background-color: var(--zinc-900);
+  border-color: var(--zinc-900);
+  color: #ffffff;
+}
+
+/* Single Box Medicine Details Card */
+.medicine-card {
+  width: 100%;
+  padding: 24px;
+  background-color: transparent;
+  border: 1px solid var(--zinc-200);
+  border-radius: 16px;
+  text-align: left;
+  animation: fadeIn 0.4s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.medicine-card-header {
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--zinc-200);
+  padding-bottom: 16px;
+}
+
+.medicine-card-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--zinc-900);
+  margin: 0;
+}
+
+.card-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--zinc-200);
+}
+
+.card-detail:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.card-detail:first-of-type {
+  padding-top: 0;
 }
 
 .result-label {
