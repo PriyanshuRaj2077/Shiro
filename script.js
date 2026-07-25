@@ -9,6 +9,7 @@ const searchButton = document.getElementById("search-button");
 const resultContainer = document.getElementById("result-container");
 const navAbout = document.getElementById("nav-about");
 const navCredits = document.getElementById("nav-credits");
+const themeToggle = document.getElementById("theme-toggle");
 const modalOverlay = document.getElementById("modal-overlay");
 const modalClose = document.getElementById("modal-close");
 const modalTitle = document.getElementById("modal-title");
@@ -66,10 +67,25 @@ async function searchMedicine(query) {
           const brandNames = r.openfda?.brand_name || [];
           const genericNames = r.openfda?.generic_name || [];
           
-          // OTC Fallbacks
-          const purpose = r.purpose?.[0] || r.indications_and_usage?.[0] || null;
-          const mechanism = r.mechanism_of_action?.[0] || r.active_ingredient?.[0] || null;
-          const sideEffects = r.adverse_reactions || r.warnings || null;
+          // Waterfall for Purpose (What the drug is for)
+          const purpose = r.purpose?.[0] || 
+                          r.indications_and_usage?.[0] || 
+                          r.indications_and_usage_table?.[0] || 
+                          r.description?.[0] || 
+                          "Information about the purpose of this medicine is not available on the label.";
+          
+          // Waterfall for Mechanism (How it works)
+          const mechanism = r.mechanism_of_action?.[0] || 
+                            (r.active_ingredient?.[0] ? "Active Ingredient: " + r.active_ingredient[0] : null) || 
+                            r.description?.[0] || 
+                            "Information about how this medicine works is not available on the label.";
+          
+          // Waterfall for Side Effects
+          const sideEffects = r.adverse_reactions || 
+                              r.warnings || 
+                              r.warnings_and_cautions || 
+                              r.precautions || 
+                              ["No specific side effects or warnings are reported on the label."];
 
           return {
             brandName: brandNames[0] || null,
@@ -267,11 +283,11 @@ function escapeHTML(unsafe) {
 const modalData = {
   about: {
     title: "About",
-    text: "Shiro helps you understand what your medicine actually does to your body, in plain language."
+    html: `Shiro helps you understand what your medicine actually does to your body, in plain language.<br><br>Developed by <a href="https://www.linkedin.com/in/priyanshuraj2077/" target="_blank" class="modal-link">Priyanshu Raj</a>.`
   },
   credits: {
     title: "Credits",
-    text: "Drug data provided free by the openFDA API (U.S. Food & Drug Administration)."
+    html: `Drug data provided free by the openFDA API (U.S. Food & Drug Administration).`
   }
 };
 
@@ -280,7 +296,7 @@ function openModal(type) {
   const content = modalData[type];
   if (content) {
     modalTitle.textContent = content.title;
-    modalText.textContent = content.text;
+    modalText.innerHTML = content.html;
     modalOverlay.classList.remove("hidden");
     modalClose.focus();
   }
@@ -309,3 +325,17 @@ document.addEventListener("keydown", (event) => {
     closeModal();
   }
 });
+
+// Theme toggle logic (Light vs. Dark)
+themeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("dark-theme");
+  const isDark = document.body.classList.contains("dark-theme");
+  themeToggle.textContent = isDark ? "Light" : "Dark";
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+});
+
+// Load saved theme preference on page load
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark-theme");
+  themeToggle.textContent = "Light";
+}

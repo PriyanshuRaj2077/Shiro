@@ -25,6 +25,16 @@ public class Result {
 
     private List<String> warnings;
 
+    private List<String> description;
+
+    @JsonProperty("warnings_and_cautions")
+    private List<String> warningsAndCautions;
+
+    private List<String> precautions;
+
+    @JsonProperty("indications_and_usage_table")
+    private List<String> indicationsAndUsageTable;
+
     // Getters and Setters
     public OpenFda getOpenFda() {
         return openFda;
@@ -80,5 +90,37 @@ public class Result {
 
     public void setWarnings(List<String> warnings) {
         this.warnings = warnings;
+    }
+
+    public List<String> getDescription() {
+        return description;
+    }
+
+    public void setDescription(List<String> description) {
+        this.description = description;
+    }
+
+    public List<String> getWarningsAndCautions() {
+        return warningsAndCautions;
+    }
+
+    public void setWarningsAndCautions(List<String> warningsAndCautions) {
+        this.warningsAndCautions = warningsAndCautions;
+    }
+
+    public List<String> getPrecautions() {
+        return precautions;
+    }
+
+    public void setPrecautions(List<String> precautions) {
+        this.precautions = precautions;
+    }
+
+    public List<String> getIndicationsAndUsageTable() {
+        return indicationsAndUsageTable;
+    }
+
+    public void setIndicationsAndUsageTable(List<String> indicationsAndUsageTable) {
+        this.indicationsAndUsageTable = indicationsAndUsageTable;
     }
 }

@@ -46,30 +46,54 @@ public class MedicineService {
                             : null
             );
 
-            // Set Purpose (use Indications as fallback for OTC drugs)
+            // ==========================================
+            // WATERFALL FOR PURPOSE (What the drug is for)
+            // ==========================================
             String purpose = null;
             if (result.getPurpose() != null && !result.getPurpose().isEmpty()) {
                 purpose = result.getPurpose().get(0);
             } else if (result.getIndicationsAndUsage() != null && !result.getIndicationsAndUsage().isEmpty()) {
                 purpose = result.getIndicationsAndUsage().get(0);
+            } else if (result.getIndicationsAndUsageTable() != null && !result.getIndicationsAndUsageTable().isEmpty()) {
+                purpose = result.getIndicationsAndUsageTable().get(0);
+            } else if (result.getDescription() != null && !result.getDescription().isEmpty()) {
+                purpose = result.getDescription().get(0);
+            } else {
+                purpose = "Information about the purpose of this medicine is not available on the label.";
             }
             medicineResponse.setPurpose(purpose);
 
-            // Set Mechanism (use Active Ingredient as fallback for OTC drugs)
+            // ==========================================
+            // WATERFALL FOR MECHANISM (How it works)
+            // ==========================================
             String mechanism = null;
             if (result.getMechanismOfAction() != null && !result.getMechanismOfAction().isEmpty()) {
                 mechanism = result.getMechanismOfAction().get(0);
             } else if (result.getActiveIngredient() != null && !result.getActiveIngredient().isEmpty()) {
-                mechanism = result.getActiveIngredient().get(0);
+                mechanism = "Active Ingredient: " + result.getActiveIngredient().get(0);
+            } else if (result.getDescription() != null && !result.getDescription().isEmpty()) {
+                mechanism = result.getDescription().get(0);
+            } else {
+                mechanism = "Information about how this medicine works is not available on the label.";
             }
             medicineResponse.setMechanism(mechanism);
 
-            // Set Side Effects (use Warnings as fallback for OTC drugs)
+            // ==========================================
+            // WATERFALL FOR SIDE EFFECTS
+            // ==========================================
             List<String> sideEffects = null;
             if (result.getAdverseReactions() != null && !result.getAdverseReactions().isEmpty()) {
                 sideEffects = result.getAdverseReactions();
             } else if (result.getWarnings() != null && !result.getWarnings().isEmpty()) {
                 sideEffects = result.getWarnings();
+            } else if (result.getWarningsAndCautions() != null && !result.getWarningsAndCautions().isEmpty()) {
+                sideEffects = result.getWarningsAndCautions();
+            } else if (result.getPrecautions() != null && !result.getPrecautions().isEmpty()) {
+                sideEffects = result.getPrecautions();
+            } else {
+                List<String> fallbackSideEffects = new ArrayList<>();
+                fallbackSideEffects.add("No specific side effects or warnings are reported on the label.");
+                sideEffects = fallbackSideEffects;
             }
             medicineResponse.setSideEffects(sideEffects);
 
