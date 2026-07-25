@@ -6,133 +6,263 @@
   </picture>
 </p>
 
-<p align="center">Look up any medicine — what it does, interactions, and side effects, in plain language.</p>
+<p align="center">
+  Look up any medicine — understand its purpose, usage, and possible side effects in plain language.
+</p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/status-in%20development-yellow" alt="Status">
+  <img src="https://img.shields.io/badge/status-active-success" alt="Status">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+  <img src="https://img.shields.io/badge/backend-Spring%20Boot-green" alt="Backend">
+  <img src="https://img.shields.io/badge/frontend-Vanilla%20JS-orange" alt="Frontend">
 </p>
 
 ---
 
-## Philosophy
+# Philosophy
 
-Shiro is built on one idea: **radical simplicity**. No dashboards, no ads, no unnecessary UI. One search box, one clean result. The name *Shiro* (白) means "white" in Japanese — a nod to the clean, minimal aesthetic the whole project is built around.
+Shiro is built on one idea: **radical simplicity**.
 
----
+Medicine information on the web is often cluttered with advertisements, medical jargon, and unnecessary navigation. Shiro removes that complexity by providing a single, distraction-free search experience.
 
-## Features
-
-### Current (Frontend)
-- Minimalist single-page interface — logo, search box, nothing else
-- Clean, distraction-free result display (medicine name, purpose, mechanism, side effects)
-- Responsive design — works on mobile, tablet, and desktop
-- About and Credits sections via lightweight modals
-
-### Planned (Backend)
-- Real-time medicine data lookup via the [openFDA API](https://open.fda.gov/apis/)
-- Caching layer — searched medicines are stored locally so repeat lookups are instant
-- Search history for registered users
-- Save medicines to a personal list ("my medicines")
-- Basic drug interaction checks (future phase)
+The name **Shiro (白)** means *white* in Japanese, representing clarity, simplicity, and minimal design.
 
 ---
 
-## Tech Stack
+# Features
 
-**Frontend**
-- HTML5, CSS3, Vanilla JavaScript (no frameworks, no build tools)
-- Google Fonts: Inter, Noto Sans JP
+### Current
 
-**Backend** *(in progress)*
-- Java 17
-- Spring Boot 3 (Spring Web, Spring Data JPA, Spring Security)
-- MySQL
+- Search medicines by brand name
+- Plain-language medicine information
+- Purpose / Indications
+- Mechanism of action (when available)
+- Common side effects (when available)
+- Intelligent fallback handling for incomplete API responses
+- Responsive minimalist interface
+- Lightweight About & Credits modal
+- Backend REST API built with Spring Boot
+- Real-time medicine lookup using the OpenFDA API
+
+---
+
+# Upcoming
+
+- Multiple medicine search results
+- Better search ranking
+- Generic medicine suggestions
+- Drug interaction lookup
+- Medicine bookmarking
+- Search history
+- Caching frequently searched medicines
+- AI-generated simplified medicine explanations
+
+---
+
+# Tech Stack
+
+## Frontend
+
+- HTML5
+- CSS3
+- Vanilla JavaScript
+- Google Fonts (Inter, Noto Sans JP)
+
+## Backend
+
+- Java 21
+- Spring Boot 3
+- Spring Web
 - Maven
+- RestClient
+- Jackson JSON
 
-**Data Source**
-- [openFDA API](https://open.fda.gov/apis/) — free, public FDA drug data
+## External API
 
-**Deployment** *(planned)*
-- Frontend: Vercel
-- Backend: Render
+- OpenFDA Drug Label API
 
 ---
 
-## Project Structure
+# Architecture
+
+```
+                User
+                  │
+                  ▼
+         HTML + CSS + JavaScript
+                  │
+                  ▼
+      GET /api/medicine/search
+                  │
+                  ▼
+        Spring Boot Controller
+                  │
+                  ▼
+          MedicineService
+                  │
+                  ▼
+          OpenFdaClient
+                  │
+                  ▼
+          OpenFDA REST API
+                  │
+                  ▼
+        OpenFdaResponse DTO
+                  │
+                  ▼
+      MedicineResponse DTO
+                  │
+                  ▼
+            JSON Response
+                  │
+                  ▼
+        Rendered in Browser
+```
+
+---
+
+# Backend Structure
+
+```
+backend/
+│
+├── controller/
+│   └── MedicineController.java
+│
+├── service/
+│   └── MedicineService.java
+│
+├── client/
+│   └── OpenFdaClient.java
+│
+├── dto/
+│   ├── MedicineResponse.java
+│   ├── OpenFdaResponse.java
+│   ├── Result.java
+│   └── OpenFda.java
+│
+└── ShiroApplication.java
+```
+
+---
+
+# Project Structure
 
 ```
 shiro/
-├── docs/
-│   └── logo/
-│       ├── shiro-logo-white.svg
-│       └── shiro-logo-black.svg
+
+├── backend/
+│
 ├── frontend/
 │   ├── index.html
 │   ├── style.css
 │   └── script.js
-├── backend/
-│   └── (Spring Boot project — coming soon)
+│
+├── docs/
+│   └── logo/
+│
 └── README.md
 ```
 
 ---
 
-## Getting Started (Frontend)
+# API
 
-The frontend currently runs against mock data while the backend is under development.
-
-```bash
-cd frontend
-python -m http.server 8000
-```
-
-Then open `http://localhost:8000` in your browser.
-
----
-
-## API Contract
-
-The frontend expects the backend to expose:
+### Search Medicine
 
 ```
-GET /api/medicine/search?name={query}
+GET /api/medicine/search?name={medicine}
 ```
 
-**Response shape:**
+Example
+
+```
+GET /api/medicine/search?name=dolo
+```
+
+Example Response
+
 ```json
 {
-  "genericName": "Acetaminophen",
-  "brandName": "Tylenol",
-  "purpose": "Relieves mild to moderate pain and reduces fever.",
-  "mechanism": "Inhibits prostaglandin synthesis in the central nervous system.",
-  "sideEffects": ["Nausea", "Headache", "Allergic reaction (rare)"]
+    "brandName": "DOLO-650",
+    "genericName": "ACETAMINOPHEN",
+    "purpose": "Pain reliever / Fever reducer",
+    "mechanism": "Not Available",
+    "sideEffects": [
+        "Nausea",
+        "Vomiting"
+    ]
 }
 ```
 
-If no result is found, the frontend displays a plain "No results found." message.
+---
+
+# Running Locally
+
+## Backend
+
+```
+cd backend
+
+./mvnw spring-boot:run
+```
+
+Runs on
+
+```
+http://localhost:8080
+```
 
 ---
 
-## Disclaimer
+## Frontend
 
-Shiro provides informational data sourced from the openFDA API for educational purposes only. It is **not** a substitute for professional medical advice. Always consult a doctor or pharmacist regarding your medication.
+Serve the frontend using any static server.
 
----
+Example:
 
-## Credits
+```
+python -m http.server 5500
+```
 
-- Drug data provided free by the [openFDA API](https://open.fda.gov/), maintained by the U.S. Food & Drug Administration.
-- Fonts via [Google Fonts](https://fonts.google.com/) (Inter, Noto Sans JP).
-
----
-
-## Author
-
-Built by **Priyanshu Raj** ([@PriyanshuRaj2077](https://github.com/PriyanshuRaj2077)) as a personal learning project — combining Java/Spring Boot backend development with a focus on clean, minimalist product design.
+or use the VS Code Live Server extension.
 
 ---
 
-## License
+# Current Limitations
 
-MIT License — free to use, modify, and distribute.
+- Uses OpenFDA as the primary data source.
+- Some medicines do not expose complete information because OpenFDA labels vary between manufacturers.
+- Mechanism of action and side effects may not be available for every medicine.
+- Currently searches by brand name.
+
+---
+
+# Disclaimer
+
+Shiro provides educational information sourced from the OpenFDA Drug Label API.
+
+It is **not** intended to replace professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional before taking or changing any medication.
+
+---
+
+# Credits
+
+- OpenFDA API
+- U.S. Food & Drug Administration
+- Google Fonts (Inter & Noto Sans JP)
+
+---
+
+# Author
+
+**Priyanshu Raj**
+
+GitHub:
+https://github.com/PriyanshuRaj2077
+
+---
+
+# License
+
+MIT License
