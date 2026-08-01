@@ -17,20 +17,16 @@ public class MedicineService {
         this.openFdaClient = openFdaClient;
     }
 
-    // Call client to get drug label results and map them to our response DTO
     public List<MedicineResponse> searchMedicine(String name) {
         OpenFdaResponse response = openFdaClient.fetchMedicine(name);
         List<MedicineResponse> list = new ArrayList<>();
 
-        // Stop if response is null (e.g. 404 error from openFDA)
         if (response == null || response.getResults() == null) {
             return list;
         }
 
-        // Loop through all drug label results
         for (Result result : response.getResults()) {
-            // Make sure the result has at least a brand name
-            if (result.getOpenFda() == null || 
+            if (result.getOpenFda() == null ||
                 result.getOpenFda().getBrandName() == null || 
                 result.getOpenFda().getBrandName().isEmpty()) {
                 continue;
@@ -39,16 +35,14 @@ public class MedicineService {
             MedicineResponse medicineResponse = new MedicineResponse();
             medicineResponse.setBrandName(result.getOpenFda().getBrandName().get(0));
 
-            // Set generic name if present
             medicineResponse.setGenericName(
                     result.getOpenFda().getGenericName() != null && !result.getOpenFda().getGenericName().isEmpty()
                             ? result.getOpenFda().getGenericName().get(0)
                             : null
             );
 
-            // ==========================================
-            // WATERFALL FOR PURPOSE (What the drug is for)
-            // ==========================================
+            // waterfall for purpose
+
             String purpose = null;
             if (result.getPurpose() != null && !result.getPurpose().isEmpty()) {
                 purpose = result.getPurpose().get(0);
@@ -63,9 +57,8 @@ public class MedicineService {
             }
             medicineResponse.setPurpose(purpose);
 
-            // ==========================================
-            // WATERFALL FOR MECHANISM (How it works)
-            // ==========================================
+            // waterfall for mechanism
+
             String mechanism = null;
             if (result.getMechanismOfAction() != null && !result.getMechanismOfAction().isEmpty()) {
                 mechanism = result.getMechanismOfAction().get(0);
@@ -78,9 +71,9 @@ public class MedicineService {
             }
             medicineResponse.setMechanism(mechanism);
 
-            // ==========================================
-            // WATERFALL FOR SIDE EFFECTS
-            // ==========================================
+
+            // waterfall fall for side effects
+
             List<String> sideEffects = null;
             if (result.getAdverseReactions() != null && !result.getAdverseReactions().isEmpty()) {
                 sideEffects = result.getAdverseReactions();

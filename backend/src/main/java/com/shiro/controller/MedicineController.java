@@ -18,7 +18,6 @@ public class MedicineController{
         this.medicineService = medicineService;
     }
 
-    // Endpoint to search for a medicine by name: GET /api/medicine/search?name=dolo
     @GetMapping("/search")
     public List<MedicineResponse> search(@RequestParam String name){
         return medicineService.searchMedicine(name);

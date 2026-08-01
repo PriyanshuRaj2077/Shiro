@@ -3,7 +3,6 @@ package com.shiro.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
-// Represents a single drug result inside openFDA response list
 public class Result {
 
     @JsonProperty("openfda")
@@ -35,7 +34,7 @@ public class Result {
     @JsonProperty("indications_and_usage_table")
     private List<String> indicationsAndUsageTable;
 
-    // Getters and Setters
+    // Getter and Setters
     public OpenFda getOpenFda() {
         return openFda;
     }
