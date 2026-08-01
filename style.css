@@ -1,6 +1,5 @@
 /* Shiro (白) - CSS Stylesheet */
 
-/* Custom Palette Variables */
 :root {
   --zinc-900: #1c1c1c;      /* Sumi calligraphic ink black */
   --zinc-500: #71717a;
@@ -36,7 +35,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.4s ease, color 0.4s ease;
   
-  /* Layout: Center everything on screen */
+  /* Layout */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -174,7 +173,7 @@ body {
   opacity: 0.9;
 }
 
-/* Results Display Container */
+/* Result Display Container */
 #result-container {
   width: 100%;
   max-width: 480px;
@@ -239,12 +238,12 @@ body {
   width: 100%;
   padding-bottom: 4px;
   -webkit-overflow-scrolling: touch;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  
+  scrollbar-width: none; 
 }
 
 .similar-pills::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for Chrome, Safari and Opera */
+  display: none; /* Hide scrollbar for Chrome */
 }
 
 .similar-pill {

@@ -326,7 +326,7 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-// Theme toggle logic (Light vs. Dark)
+// Theme(Light vs. Dark)
 themeToggle.addEventListener("click", () => {
   document.body.classList.toggle("dark-theme");
   const isDark = document.body.classList.contains("dark-theme");
