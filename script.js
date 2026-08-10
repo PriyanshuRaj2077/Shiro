@@ -1,6 +1,6 @@
 // Shiro (白) - Application Logic
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = window.SHIRO_API_BASE_URL || window.API_BASE_URL || "http://localhost:8080";
 
 // DOM Elements
 const searchForm = document.getElementById("search-form");
