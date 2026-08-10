@@ -71,7 +71,7 @@ The name **Shiro (白)** means *white* in Japanese, representing clarity, simpli
 ## Backend
 
 - Java 21
-- Spring Boot 3
+- Spring Boot 4.0.7
 - Spring Web
 - Maven
 - RestClient
@@ -85,7 +85,7 @@ The name **Shiro (白)** means *white* in Japanese, representing clarity, simpli
 
 # Architecture
 
-```
+```text
                 User
                   │
                   ▼
@@ -123,45 +123,52 @@ The name **Shiro (白)** means *white* in Japanese, representing clarity, simpli
 
 # Backend Structure
 
-```
+```text
 backend/
 │
-├── controller/
-│   └── MedicineController.java
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── com/shiro/
+│       │       ├── controller/
+│       │       │   └── MedicineController.java
+│       │       ├── service/
+│       │       │   └── MedicineService.java
+│       │       ├── client/
+│       │       │   └── OpenFdaClient.java
+│       │       └── dto/
+│       │           ├── MedicineResponse.java
+│       │           ├── OpenFdaResponse.java
+│       │           ├── Result.java
+│       │           └── OpenFda.java
+│       └── resources/
 │
-├── service/
-│   └── MedicineService.java
-│
-├── client/
-│   └── OpenFdaClient.java
-│
-├── dto/
-│   ├── MedicineResponse.java
-│   ├── OpenFdaResponse.java
-│   ├── Result.java
-│   └── OpenFda.java
-│
-└── ShiroApplication.java
+├── pom.xml
+├── mvnw
+├── Dockerfile
+└── .mvn/
 ```
 
 ---
 
 # Project Structure
 
-```
+```text
 shiro/
-
-├── backend/
 │
-├── frontend/
-│   ├── index.html
-│   ├── style.css
-│   └── script.js
+├── backend/
+│   ├── src/
+│   ├── pom.xml
+│   ├── mvnw
+│   └── Dockerfile
 │
 ├── docs/
-│   └── logo/
-│
-└── README.md
+├── index.html
+├── script.js
+├── style.css
+├── README.md
+├── LICENSE
+└── package-lock.json
 ```
 
 ---
@@ -170,29 +177,33 @@ shiro/
 
 ### Search Medicine
 
-```
+```text
 GET /api/medicine/search?name={medicine}
 ```
 
-Example
+Example:
 
-```
+```text
 GET /api/medicine/search?name=dolo
 ```
 
-Example Response
+The endpoint returns a JSON array of medicine results.
+
+Example Response:
 
 ```json
-{
+[
+  {
     "brandName": "DOLO-650",
     "genericName": "ACETAMINOPHEN",
     "purpose": "Pain reliever / Fever reducer",
     "mechanism": "Not Available",
     "sideEffects": [
-        "Nausea",
-        "Vomiting"
+      "Nausea",
+      "Vomiting"
     ]
-}
+  }
+]
 ```
 
 ---
@@ -201,31 +212,86 @@ Example Response
 
 ## Backend
 
-```
+```bash
 cd backend
-
 ./mvnw spring-boot:run
 ```
 
-Runs on
+The backend defaults to:
 
-```
+```text
 http://localhost:8080
 ```
 
----
+The application also supports a `PORT` environment variable for deployment platforms that assign the server port dynamically.
 
 ## Frontend
 
-Serve the frontend using any static server.
+The frontend is a static HTML/CSS/JavaScript application.
 
-Example:
+Serve the repository root using any static server.
 
-```
+For example:
+
+```bash
 python -m http.server 5500
 ```
 
 or use the VS Code Live Server extension.
+
+---
+
+# Deployment
+
+Shiro is deployed using separate frontend and backend services.
+
+## Frontend
+
+Hosted on Vercel:
+
+https://shiro-med.vercel.app
+
+## Backend
+
+Hosted on Render:
+
+https://shiro-255r.onrender.com
+
+The deployed frontend communicates with the Spring Boot REST API hosted on Render.
+
+The production frontend is configured to use the deployed backend URL, while the backend retains port `8080` as its local default and supports the hosting platform's dynamically assigned `PORT`.
+
+---
+
+# Docker
+
+The backend includes a multi-stage Dockerfile using Java 21.
+
+The build stage uses a Java 21 JDK to compile the Spring Boot application, while the runtime stage uses a Java 21 JRE to run the generated JAR.
+
+Build the backend image from the repository root:
+
+```bash
+docker build -t shiro-backend ./backend
+```
+
+Run the container locally:
+
+```bash
+docker run -p 8080:8080 shiro-backend
+```
+
+The application supports dynamic ports through the `PORT` environment variable when deployed to hosting platforms.
+
+For example:
+
+```bash
+docker run -e PORT=8080 -p 8080:8080 shiro-backend
+```
+
+The Dockerfile was used by Render to build and deploy the backend container.
+
+Local Docker CLI verification was not performed because Docker was unavailable in the development environment.
 
 ---
 
@@ -259,6 +325,7 @@ It is **not** intended to replace professional medical advice, diagnosis, or tre
 **Priyanshu Raj**
 
 GitHub:
+
 https://github.com/PriyanshuRaj2077
 
 ---
